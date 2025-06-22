@@ -1,0 +1,18 @@
+2025-06-22 12:32:59,491 - INFO - Initializing Elasticsearch connection...
+2025-06-22 12:32:59,491 - ERROR - Failed to connect to Elasticsearch: Elasticsearch.__init__() got an unexpected keyword argument 'timeout'
+2025-06-22 12:32:59,491 - ERROR - Main execution error: Elasticsearch.__init__() got an unexpected keyword argument 'timeout'
+2025-06-22 12:33:41,544 - INFO - Initializing Elasticsearch connection...
+2025-06-22 12:33:41,544 - ERROR - Failed to connect to Elasticsearch: Elasticsearch.__init__() got an unexpected keyword argument 'timeout'
+2025-06-22 12:33:41,544 - ERROR - Main execution error: Elasticsearch.__init__() got an unexpected keyword argument 'timeout'
+2025-06-22 12:34:49,611 - INFO - Initializing Elasticsearch connection...
+2025-06-22 12:34:49,637 - INFO - GET http://localhost:9200/ [status:200 duration:0.003s]
+2025-06-22 12:34:49,637 - INFO - Successfully connected to Elasticsearch
+2025-06-22 12:34:49,639 - INFO - HEAD http://localhost:9200/prothomalo_articles [status:404 duration:0.002s]
+2025-06-22 12:34:50,092 - INFO - PUT http://localhost:9200/prothomalo_articles [status:200 duration:0.452s]
+2025-06-22 12:34:50,093 - INFO - Created index: prothomalo_articles
+2025-06-22 12:34:50,093 - INFO - Initializing scraper...
+2025-06-22 12:34:50,094 - INFO - Getting article URLs...
+2025-06-22 12:34:50,095 - INFO - Scraping page 1: https://www.prothomalo.com/politics
+2025-06-22 12:34:50,292 - WARNING - No articles found on page 1
+2025-06-22 12:34:50,292 - INFO - Total unique articles found: 0
+2025-06-22 12:34:50,292 - ERROR - No article URLs found

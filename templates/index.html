@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Prothom Alo Politics News</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+        h1 { color: #bd0000; }
+        .card {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card h2 { margin: 0 0 10px; color: #333; }
+        .meta { font-size: 0.9em; color: #777; margin-bottom: 10px; }
+        .content { color: #444; }
+    </style>
+</head>
+<body>
+
+<h1>📰 Prothom Alo Politics News</h1>
+<div id="news-container">Loading news...</div>
+
+<script>
+    fetch('/api/news')
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '';
+            data.forEach(article => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <h2><a href="${article.url}" target="_blank">${article.headline}</a></h2>
+                    <div class="meta">🕒 ${article.published_at} | ✍️ ${article.author} | 📍 ${article.location}</div>
+                    <div class="content">${article.content.substring(0, 300)}...</div>
+                `;
+                container.appendChild(div);
+            });
+        })
+        .catch(err => {
+            document.getElementById('news-container').innerHTML = 'Failed to load news.';
+            console.error('Error loading news:', err);
+        });
+</script>
+
+</body>
+</html>

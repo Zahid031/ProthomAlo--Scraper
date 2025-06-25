@@ -125,7 +125,7 @@ class ProthomAloScraper:
                         },
                         "author": {"type": "text"},
                         "location": {"type": "keyword"},
-                        "published_at": {"type": "date", "format": "yyyy-MM-dd"},
+                        "published_at": {"type": "date", "format": "yyyy-MM-dd HH:mm"},
                         "content": {
                             "type": "text", 
                             "analyzer": "bengali_analyzer"
@@ -144,40 +144,76 @@ class ProthomAloScraper:
             logger.error(f"Failed to create index: {e}")
             return False
     
+    # def parse_bengali_date(self, date_str: str) -> Optional[str]:
+    #     """
+    #     Converts Bengali date string to ISO format (YYYY-MM-DD).
+        
+    #     Args:
+    #         date_str: Bengali date string (e.g., "২২ জুন ২০২৫")
+            
+    #     Returns:
+    #         str: ISO formatted date or None if parsing fails
+    #     """
+    #     if not date_str or "not found" in date_str.lower():
+    #         return None
+        
+    #     try:
+    #         # Convert Bengali digits to English
+    #         date_str_en = date_str.translate(self.bengali_to_english_digits)
+    #         parts = date_str_en.split()
+            
+    #         if len(parts) < 3:
+    #             return None
+            
+    #         day, month_bn, year = parts[0], parts[1], parts[2]
+    #         month = self.bengali_months.get(month_bn)
+            
+    #         if not month:
+    #             return None
+            
+    #         # Validate and format the date
+    #         dt_object = datetime.strptime(f'{year}-{month}-{day}', '%Y-%m-%d')
+    #         return dt_object.strftime('%Y-%m-%d')
+            
+    #     except (ValueError, IndexError) as e:
+    #         logger.warning(f"Failed to parse date '{date_str}': {e}")
+    #         return None
+    
+
     def parse_bengali_date(self, date_str: str) -> Optional[str]:
         """
-        Converts Bengali date string to ISO format (YYYY-MM-DD).
-        
-        Args:
-            date_str: Bengali date string (e.g., "২২ জুন ২০২৫")
-            
-        Returns:
-            str: ISO formatted date or None if parsing fails
+        Converts Bengali datetime string (e.g. '২২ জুন ২০২৫, ১৯:১৪')
+        to ISO format with time (e.g. '2025-06-22 19:14')
         """
         if not date_str or "not found" in date_str.lower():
             return None
-        
+
         try:
-            # Convert Bengali digits to English
-            date_str_en = date_str.translate(self.bengali_to_english_digits)
-            parts = date_str_en.split()
-            
-            if len(parts) < 3:
+            # Split into date and time
+            parts = date_str.strip().split(",")
+            if len(parts) != 2:
                 return None
-            
-            day, month_bn, year = parts[0], parts[1], parts[2]
+
+            date_part_bn = parts[0].strip()
+            time_part_bn = parts[1].strip().replace(" ", "")  # Remove any extra space in time
+
+            # Translate Bengali digits
+            date_en = date_part_bn.translate(self.bengali_to_english_digits)
+            time_en = time_part_bn.translate(self.bengali_to_english_digits)
+
+            # Split and map
+            day, month_bn, year = date_en.split()
             month = self.bengali_months.get(month_bn)
-            
             if not month:
                 return None
-            
-            # Validate and format the date
-            dt_object = datetime.strptime(f'{year}-{month}-{day}', '%Y-%m-%d')
-            return dt_object.strftime('%Y-%m-%d')
-            
-        except (ValueError, IndexError) as e:
-            logger.warning(f"Failed to parse date '{date_str}': {e}")
+
+            return f"{year}-{month}-{day} {time_en}"
+
+        except Exception as e:
+            logger.warning(f"Failed to parse datetime '{date_str}': {e}")
             return None
+
+
     
     def scrape_single_article(self, url: str) -> Optional[Dict[str, Any]]:
         """
@@ -209,11 +245,9 @@ class ProthomAloScraper:
             date_tag = soup.select_one("div.time-social-share-wrapper span:first-child")
             publication_date_raw = date_tag.get_text(strip=True) if date_tag else "Date not found"
 
-            if ":" in publication_date_raw:
-                publication_date = publication_date_raw.split(":", 1)[1].strip()
-            else:
-                publication_date = publication_date_raw.replace("Published:", "").strip()
-            print(f"Publication Date: {publication_date}")
+            publication_date_cleaned = publication_date_raw.split(":", 1)[-1].strip()
+            publication_date = self.parse_bengali_date(publication_date_cleaned)
+
             
             # Extract content paragraphs
             content_paragraphs = soup.select("div.story-content p")
